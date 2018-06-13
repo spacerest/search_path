@@ -1,0 +1,32 @@
+{  
+   "name":"Search Path",
+   "description":"Keep track of your helpful google searches over history",
+   "version":"0.1",
+   "icons":{  
+      "128":"images/icon.png"
+   },
+   "manifest_version":2,
+   "minimum_chrome_version":"29",
+   "browser_action":{  
+      "default_icon":"images/icon.png",
+      "default_title":"Search Path",
+      "default_popup":"popup.html"
+   },
+   "background": { "scripts": ["background.js"], "persistent":false },
+   "permissions":[  
+      "tabs",
+	  "<all_urls>",
+      "identity",
+      "https://*.googleapis.com/*"
+   ],
+   "oauth2":{  
+      // client_id below is specifc to the application key. Follow the 
+    // documentation to obtain one for your app. 
+    "client_id": "640866731447-4adqcl2nd8b5v8dsi6sgcbqi5idsvhng.apps.googleusercontent.com",
+      "scopes":[  
+         "https://www.googleapis.com/auth/spreadsheets"
+      ]
+   },
+
+  "key":"MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDXbVfJMALWMHw/8jlHXpGS3P5mEjqfje8nsA6CtEQnHHcxo4onntUyAW99KlL5oDT0bxILXvdbLb++akikpjvkOawHxR4LDICyZphfI3u3jLs/5YSjW9yl17TM4eEAj9ILa6bDCtoHqG1K1GWNLbWPxBy2EbGy094RPDMmBo3h4kxBilVjbnPswiOhNCyL/HHu1gbFy/wcXu8EKswnENJdeEQ2udxM9IPYPL874ImUvEjVjgI136Q1F/MkbaOfWUaF3p5B9apCYcGX1sMETS6dcWCN9i5cZBTxsnOkt74C5Yacs89/vRfJbiQVjjoPAP/B5wNUTohtv9zFUJFDe2a7AgMBAAECggEAJtmuSjchW9VUoweg8tEIOc8nBetlrR6gsaybgVDXNaJ5kHco1Cpd0m3V2GHIowIUaryZKXnP7B6dBM8QGLlt9aO89Y3D9EQl9YZxFj9E8X4sysIuoHNRoIr9LTHTLRHC1JJueaA8X8MtKqCRS9uhcbLxZphcTp7M3pjXtJTcA49CLMN9mr1BQ2On+zSsh4kLAa4kz7cKiaF9rgbipx9SXhsorX8+knvnfLBos9Ly3piX7AdpFmK9xngzvThwngkV+HCFrVayF0lJJIW03Q4C1n7EqGQfspi8Ym2VPymUM46ptcxCUVOL3/+xExVgUIviXkbf5VzLBEJldYoPkCmyOQKBgQD+jYcj3tZYUAIoQUBnJDkh8vvw3huxLlNVFctFJmuhbW1U7eKV3RsNKIqfbr5ENoJ8LI4guIl1z/tY2IzUG8HW45ShoZt260KDOV/Oz9Y5zOo9pt3xUOsnBlmwuRcDC3U/Pp0ejrlvq2sivtk7bJEZXzn9Uh5CV9CFUE38WPxHfQKBgQDYpt9AXyst8cRvlXtNwDBALY71ORynA4gNmy+1fBupNON5jEq+SayVq0H7UhzGpSF2yUmWYILGmHJOld1vZex5JymlVuUj8L+gfj5C4R6bekO0kCJlJMMM6UorafmBx/Z0+T17V4M1VDFgtnTOrk1wz6+CuM+j311FvZTknr7slwKBgDJWioLtbjXInKSZQsMixqmQA4J+abuADbqltKzYDDDAEv7YjBZWwyK3AbLFk5qprOQha3nNBGHn3yySpkbLtmloV9weuT+rBlws3GVpdFO50hifBwTRm6778oCgGYzgly8KkseYMdODcoxMcWju70K1MiKGOrWj5/h1CPb+IeWBAoGBAJ+YBXsw3+j/YPnlvqgevCx6owWnpaCuLEoBmFpzaxjxOeRu4Rxdv0Gdn4RYD5SRTh5n1spsm8lZwVJ8eVs3VMRGghom8bLRBQhgFtNDbD2SCk/3oS6qrvhS3e0vKrpcqAOxGoZCiAf/1kPtBAzAP5GrnBmKtIJ95wKZzhW/jttPAoGAM5+5STd0AKjmG1j5q8i1xELy3/BHCizzcn0/d6gBSAYZX/Pz1VY3rcUEmQ6crC5H3ncDr+/C1fXX7b0RguG3QqRRtWL1T4l1BZdZp7pAOufy14xVo9cQ4K2DRorMKj98E4EnVg5hDAvrglKTolX2G5Q+qAJd3zDWRctau6VgH7g="
+}

@@ -1,0 +1,40 @@
+<html>
+  <head>
+    <title>Search Path</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script src="js/popup.js"></script>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Search Path</h1>
+      <div class="links">
+        Learn more:
+          <a target="_blank" href="https://github.com/spacerest">Source</a>
+      </div>
+      <hr>
+    </div>
+       <div class="log">
+	  <div class="search-terms-container">
+	    <div class="search-terms">
+	      <select id="search-term-select">
+	      </select>
+	    </div>
+	    <div id="custom-search-term" class="input-button-div">
+	      <input id="custom-text-input" type="text"></input>
+	      <button> + </button>
+	    </div>
+	  </div>
+	   <div class="input-button-div" id="highlight_info_div"><p><textarea id="highlight_data"></textarea></p>
+	  <button id="getxhr" disabled>Log it</button>
+	  </div>
+       </div>
+   </div>
+    <div class="flows">
+      <div class="flow">
+        <button id="signin">Authenticate</button>
+        <button id="revoke" disabled>Revoke token</button>
+      </div>
+    </div>
+
+  </body>
+</html>

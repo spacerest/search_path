@@ -1,0 +1,293 @@
+/*
+* Based on: 
+* Identity example in Chrome Apps Samples 
+* https://github.com/GoogleChrome/chrome-app-samples/tree/master/samples/identity 
+* https://github.com/GoogleChrome/chrome-app-samples/blob/master/LICENSE
+*/
+
+html, body {
+  margin: 0;
+  font-family: 'Open Sans Regular', sans;
+  color: #fefefe;
+  background: #000080;
+  width: 454px;
+  height: 560px;
+}
+
+.header {
+  text-align: center;
+  padding: 10px 0 10px 0;
+}
+
+.header hr {
+  height: 6px;
+  border: none;
+  margin-top: 20px;
+  background: -webkit-linear-gradient(0deg,
+    rgb(51,105,232) 0%,
+    rgb(51,105,232) 25%,
+    rgb(222,30,37) 25%,
+    rgb(222,30,37) 50%,
+    rgb(255, 210, 0) 50%,
+    rgb(255, 210, 0) 75%,
+    rgb(76,187,71) 75%,
+    rgb(76,187,71) 100%
+    );
+ }
+
+.header .links * {
+  margin-left: 5px;
+}
+
+.header .links a {
+  color: #666;
+}
+
+.header:hover .links a {
+  color: #3399cc;
+}
+
+.flows h2 {
+  margin-left: 5px;
+  margin-bottom: 10px;
+}
+
+.flow {
+  margin: 10px 20px 20px 20px;
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.flow button {
+  cursor: pointer;
+  background: -webkit-linear-gradient(top,#008dfd 0,#0370ea 100%);
+  border: 1px solid #076bd2;
+  text-shadow: 1px 1px 1px #076bd2;
+  color: white;
+  font-weight: 700;
+  font-size: 13px;
+  margin: .5em 20px 1em;
+  padding: 8px 17px 8px 17px;
+  border-radius: 3px;
+}
+
+.flow button.error {
+  background: -webkit-linear-gradient(top,#008dfd 0,#0370ea 100%);
+  border: 1px solid #076bd2;
+  text-shadow: 1px 1px 1px #076bd2;
+  color: white;
+  font-weight: 700;
+  font-size: 13px;
+  margin: .5em 0 1em;
+  padding: 8px 17px 8px 17px;
+  border-radius: 3px;
+}
+
+.flow button:disabled {
+  background: -webkit-linear-gradient(top, #dcdcdc 0, #fafafa 100%);
+  color: #999;
+  text-shadow: 1px 1px 1px #fafafa;
+  border: 1px solid #ddd;
+  cursor: auto;
+}
+
+
+.flow button.loading {
+    background-color: #008dfd;
+	}
+    .flow button.loading:before {
+      content: '';
+      position: absolute;
+      height:5px;
+      background-color: inherit;
+      left: 0;
+      bottom: 0;
+      will-change: left, right;
+      -webkit-animation: indeterminate 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+              animation: indeterminate 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite; }
+    .flow button.loading:after {
+      content: '';
+      position: absolute;
+	  height:5px;
+      background-color: inherit;
+      left: 0;
+      bottom: 0;
+      will-change: left, right;
+      -webkit-animation: indeterminate-short 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+              animation: indeterminate-short 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+      -webkit-animation-delay: 1.15s;
+              animation-delay: 1.15s; }
+
+@-webkit-keyframes indeterminate {
+  0% {
+    left: -35%;
+    right: 100%; }
+  60% {
+    left: 100%;
+    right: -90%; }
+  100% {
+    left: 100%;
+    right: -90%; } }
+@keyframes indeterminate {
+  0% {
+    left: -35%;
+    right: 100%; }
+  60% {
+    left: 100%;
+    right: -90%; }
+  100% {
+    left: 100%;
+    right: -90%; } }
+@-webkit-keyframes indeterminate-short {
+  0% {
+    left: -200%;
+    right: 100%; }
+  60% {
+    left: 107%;
+    right: -8%; }
+  100% {
+    left: 107%;
+    right: -8%; } }
+@keyframes indeterminate-short {
+  0% {
+    left: -200%;
+    right: 100%; }
+  60% {
+    left: 107%;
+    right: -8%; }
+  100% {
+    left: 107%;
+    right: -8%; } }
+
+.log {
+  margin: 10px 20px 20px 20px;
+}
+
+.log textarea {
+  width: 100%;
+  min-height: 120px;
+  font-family: "Courier New", Courier, monospace;
+  background: #FFFFFF;
+  color: #727272;
+  border: 1px solid rgb(182, 182, 182);
+}
+
+#exec_data{
+  min-height: 80px;
+}
+
+
+
+
+
+.input-button-div {
+  display:inline-block;
+  position:relative;
+  width: 100%;
+  height: 150px;
+}
+
+.input-button-div button {
+  position:absolute;
+  bottom:0px;
+  right:0px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  height: 100%;
+  width: 25%;
+  background: rgb(0,219,7);
+  color: white;
+  outline: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  box-sizing: border-box;
+  transition: all .2s ease-in;
+  font-size: 20px;
+  }
+
+#custom-search-term button {
+  vertical-align: top;
+  width: 13%;
+}
+
+#custom-search-term input {
+  width: 87%;
+}
+.input-button-div button:hover {
+    cursor: pointer;
+    background: rgb(15,209,22);
+  }
+
+.search-terms {
+   background: url(http://i62.tinypic.com/2e3ybe1.jpg) no-repeat right center;
+   height: 34px;
+   overflow: hidden;
+   margin: 20px 0px;
+}
+select {
+   -moz-appearance: window;
+    -webkit-appearance: none;
+   background: rgba(255,255,255,.2);
+   color: rgb(255,255,255);
+   border-radius: 0;
+   font-size: 14px;
+   padding: 5px;
+   width: 100%;
+   border: 1px solid #ccc;
+   font-size: 16px;
+   height: 34px;
+}
+
+select:hover {
+  cursor: pointer;
+}
+
+
+.input-button-div textarea, input {
+  box-sizing: border-box;
+  display:block;
+  height: 100%;
+  width: 75%;
+  border: none;
+  overflow: auto;
+  outline: none;
+  position: absolute;
+  bottom:0px;
+  left: 0px;
+  resize: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  padding-left: 10px; 
+}
+
+textarea {
+  padding-top: 10px;
+}
+
+input {
+  width: 100%;
+}
+
+#custom-search-term {
+  position: relative;
+  height: 34px;
+  transition: all .2s ease-in-out;
+}
+
+.hidden {
+  bottom: -60px;
+}
+
+.visible {
+  bottom: 0px;
+}
+
+.search-terms-container {
+  margin: 20px 0;
+  height: 120px;
+  overflow: hidden;
+}
