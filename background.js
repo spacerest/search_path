@@ -104,29 +104,45 @@ var getSearchTerm = function (url) {
 }
   chrome.runtime.onInstalled.addListener(function() { 
     let tokenAcquired = false;
-   
+  
+      getAuthTokenSilent();
+      //chrome.browserAction.disable(); 
 
     //ask if we already have authentication. if we don't, ask for it 
-    getAuthTokenSilent();
 
     let searchDict = new SearchDict();
     let pluginEnabled = true;
     let newUrl = null;
     let isNewSearch = false;
     let currentSearchTerm = "test";
+    let possibleSchemes = ["https:", "http:", "www:"];
+    chrome.browserAction.disable();
+    console.log("disabling...");
     if (pluginEnabled) {
+      chrome.tabs.onHighlighted.addListener(function(highlightInfo) {
+	chrome.tabs.query({"active": true, "lastFocusedWindow": true}, function(tabs) {
+	var currentUrl = new URL(tabs[0].url);
+	  if(possibleSchemes.indexOf(currentUrl.protocol) != -1) {
+      	      chrome.browserAction.enable(tabs[0].id); 
+	      console.log("enabling...");
+	  }
+	})
+      })
       chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-      
-      if (changeInfo.status == "complete" && newUrl) {
-      //check if this was a new search
-	newSearchTerm = "";
-	if (newUrl.hostname == "www.google.at") {
-	  newSearchTerm = getSearchTerm(newUrl);
+	if (tab.url) {
+	  newUrl = new URL(tab.url);
+	  if(possibleSchemes.indexOf(newUrl.protocol) != -1) {
+      	    chrome.browserAction.enable(tabId); 
+	    newSearchTerm = "";
+	    if (newUrl.hostname == "www.google.at") {
+	      newSearchTerm = getSearchTerm(newUrl);
+	    }
+	    searchDict.addUrlToTab(newSearchTerm, tabId, newUrl.href, lastOpenTabId);
+	  }
 	}
-	searchDict.addUrlToTab(newSearchTerm, tabId, newUrl.href, lastOpenTabId);
-	lastOpenTabId = tabId;
-      } else if (changeInfo.status == "loading" && changeInfo.url){
-	newUrl = new URL(changeInfo.url);
+        if (changeInfo.status == "complete" && newUrl) {
+      //check if this was a new search
+	  lastOpenTabId = tabId;
       }
       }
     )
@@ -200,7 +216,6 @@ var getSearchTerm = function (url) {
       showAuthenticationNeeded();
     } else {
       removeAuthenticationNeeded();
-      return true;
     }
   }
 

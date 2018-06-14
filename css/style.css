@@ -9,8 +9,8 @@ html, body {
   margin: 0;
   font-family: 'Open Sans Regular', sans;
   color: #fefefe;
-  background: #000080;
   width: 454px;
+  background: #000080;
   height: 560px;
 }
 
@@ -290,4 +290,41 @@ input {
   margin: 20px 0;
   height: 120px;
   overflow: hidden;
+}
+
+#sending_gif {
+  height: 100%; 
+  width: 100%;
+  z-index: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  background: rgba(255,255,255, .1);
+}
+
+#loading_gif {
+  background: #000080;
+  display: block;
+  position: absolute;
+  z-index: 2;
+  height: 100%;
+  width: 100%;
+}
+
+#loading_gif img {
+  height: auto;
+  width: 100%;
+  
+}
+#show_result_success {
+  padding: 0 20px;
+  height: 30px;
+  color: rgb(0,219,7);
+}
+
+#show_result_error {
+  padding: 0 20px;
+  height: 30px;
+  color: red;
 }

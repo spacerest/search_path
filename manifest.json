@@ -7,15 +7,21 @@
    },
    "manifest_version":2,
    "minimum_chrome_version":"29",
-   "browser_action":{  
-      "default_icon":"images/icon.png",
-      "default_title":"Search Path",
-      "default_popup":"popup.html"
-   },
+   "browser_action": {
+      "default_popup": "popup.html",
+      "default_icon": {
+        "16": "images/icon.png",
+        "32": "images/icon.png",
+        "48": "images/icon.png",
+        "128": "images/icon.png"
+      }
+    },
+ 
    "background": { "scripts": ["background.js"], "persistent":false },
    "permissions":[  
       "tabs",
 	  "<all_urls>",
+      "declarativeContent",
       "identity",
       "https://*.googleapis.com/*"
    ],

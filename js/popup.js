@@ -24,7 +24,7 @@ function Popup() {
   var searchTermsFromBackground;
   var highlightedText;
   var currentTab;
-  var signin_button, xhr_button, revoke_button, highlight_info_div, highlight_data;
+  var signin_button, xhr_button, revoke_button, highlight_info_div, highlight_data, show_result_div;
   this.currentSearchTerm;
 
   var disableButton = function(button) {
@@ -104,17 +104,18 @@ function Popup() {
   var getAuthTokenCallback = function(token) {
     if (chrome.runtime.lastError) {
   	  console.log('no token aqcuired');
-	  chrome.browserAction.setBadgeText({text: "no"});
+	  //chrome.browserAction.setBadgeText({text: "no"});
 	  changeState(STATE_START);
     } else {
   	  console.log('Token aquired');
-	  chrome.browserAction.setBadgeText({text: "yes"});
+	  //chrome.browserAction.setBadgeText({text: "yes"});
 	  changeState(STATE_AUTHTOKEN_ACQUIRED);
     }
   }
 
   var sendDataToGoogleSheetsCallback = function(token) {
     console.log(document.getElementById("highlight_data").value);
+    document.getElementById("sending_gif").style.display = "block";
     var highlightToSend = new Highlight(
       getSelectedSearchTerm(),
       dataFromBackground.page_result,
@@ -132,13 +133,21 @@ function Popup() {
   }
   
   var googleAPIResponse = function(response) {
+    document.getElementById("sending_gif").style.display = "none";
     var info;
     if (response.response.result.status == 'ok') {
-      info = "Data has been enetered into " + response.response.result.doc; 
+      info = "Data has been entered into <a href='" + response.response.result.doc + "' target='_blank'>your google sheet</a>."; 
+      document.getElementById("show_result_success").innerHTML = info; 
+      document.getElementById("highlight_data").value = ""; 
     } else {
       info = "Error..." + response.response.result.status;
+      document.getElementById("show_result_error").innerHTML = info; 
     }	
     console.log(info);
+  }
+  
+  var updatePopup = function(info) {
+     
   }
   
   var post = function(options) {
@@ -196,6 +205,7 @@ function Popup() {
     
     highlight_info_div = document.querySelector('#highlight_info_div');
     highlight_data = document.querySelector('#highlight_data');
+    show_result_div = document.querySelector('#show_result');
     
     // Trying to get access token without signing in, 
     // it will work if the application was previously 
@@ -255,6 +265,7 @@ function Popup() {
       searchTermsFromBackground = request.search_terms;
       request.highlight ? highlight_data.innerHTML = request.highlight.highlight : null;
       populateSearchTermOptions(searchTermsFromBackground, request.highlight.search_term);	
+      document.getElementById("loading_gif").style.display = "none";
     }
   } 
 }
