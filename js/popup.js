@@ -11,8 +11,6 @@ var Highlight = function(searchTerm, pageResult, highlight) {
   this.highlight = highlight;
 }
 
-
-
 function Popup() {
   var SCRIPT_ID='15uJJKus-863eXQy40-Cd6XBntQU80BAYAk_mCwfJeYjRR__BwMOu2Mob'; // Apps Script script id
   var STATE_START=1;
@@ -24,7 +22,7 @@ function Popup() {
   var searchTermsFromBackground;
   var highlightedText;
   var currentTab;
-  var signin_button, xhr_button, revoke_button, highlight_info_div, highlight_data, show_result_div;
+  var signin_button, send_to_gs_button, revoke_button, highlight_info_div, highlight_data, show_result_div, add_custom_search_term_button;
   this.currentSearchTerm;
 
   var disableButton = function(button) {
@@ -39,26 +37,53 @@ function Popup() {
     switch (state) {
       case STATE_START:
     	enableButton(signin_button);
-    	disableButton(xhr_button);
+    	disableButton(send_to_gs_button);
     	disableButton(revoke_button);
     	break;
       case STATE_ACQUIRING_AUTHTOKEN:
     	disableButton(signin_button);
-    	disableButton(xhr_button);
+    	disableButton(send_to_gs_button);
     	disableButton(revoke_button);
     	break;
       case STATE_AUTHTOKEN_ACQUIRED:
     	disableButton(signin_button);
-    	enableButton(xhr_button);
+    	enableButton(send_to_gs_button);
     	enableButton(revoke_button);
     	break;
-}
+    }
   }
 
   var getAuthToken = function(options) {
     chrome.identity.getAuthToken(
   	  { 'interactive': options.interactive },
   	  options.callback);
+  }
+
+  var addCustomSearchTerm = function() {
+    var customSearchTerm = document.getElementById("custom-text-input").value;
+    var currentTabId = null;
+    var currentTabHref = null;
+    if (customSearchTerm != "") {
+      
+      //get the data of current tab
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+         currentTabId = tabs[0].id;
+         currentTabHref = tabs[0].href;
+      });
+       
+      //send this new searchterm to background script
+      chrome.runtime.sendMessage({
+	msg: "send_new_search_term",
+	search_term: customSearchTerm,
+	tab_id: currentTabId,
+	tab_url: currentTabHref
+      });
+      
+      //update the user interface
+      
+      //erase the search term the user gave previously
+      
+    }
   }
  
   this.requestHighlightInfoFromBackground = function() {
@@ -68,7 +93,6 @@ function Popup() {
 }, function(selection) {
       highlight_data.innerHTML = selection[0];
       highlightedText = selection[0];
-
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
          currentTab = tabs[0];
          if (currentTab) { // Sanity check
@@ -79,6 +103,15 @@ function Popup() {
       ); 
     })
   } 
+
+var sendDataToBackgroundForGoogleSheets = function () {
+  chrome.runtime.sendMessage({
+    msg: "send_new_search_term",
+    search_term: customSearchTerm,
+    tab_id: currentTabId,
+    tab_url: currentTabHref
+  });
+}
 
  var sendDataToGoogleSheets = function() {
     getAuthToken({
@@ -103,37 +136,39 @@ function Popup() {
  
   var getAuthTokenCallback = function(token) {
     if (chrome.runtime.lastError) {
-  	  console.log('no token aqcuired');
-	  //chrome.browserAction.setBadgeText({text: "no"});
-	  changeState(STATE_START);
+      console.log('no token aqcuired');
+      //chrome.browserAction.setBadgeText({text: "no"});
+      changeState(STATE_START);
     } else {
-  	  console.log('Token aquired');
-	  //chrome.browserAction.setBadgeText({text: "yes"});
-	  changeState(STATE_AUTHTOKEN_ACQUIRED);
+      console.log('Token aquired');
+      //chrome.browserAction.setBadgeText({text: "yes"});
+      changeState(STATE_AUTHTOKEN_ACQUIRED);
     }
   }
 
   var sendDataToGoogleSheetsCallback = function(token) {
-    console.log(document.getElementById("highlight_data").value);
-    document.getElementById("sending_gif").style.display = "block";
+    document.getElementById("sending_gif").style.visibility = "visible";
+    document.getElementById("sending_gif").style.opacity = 1;
     var highlightToSend = new Highlight(
       getSelectedSearchTerm(),
       dataFromBackground.page_result,
       document.getElementById("highlight_data").value
     );
+    //TODO check that selected isn't + add custom
     console.log("json to send is ");
     console.log(highlightToSend);
-    post({ 'url':	  'https://script.googleapis.com/v1/scripts/' + SCRIPT_ID +
+    var jsonToSave = {msg: "new_highlight", data: highlightToSend};
+    post({'url':	  'https://script.googleapis.com/v1/scripts/' + SCRIPT_ID +
     ':run',
-  		  'callback': googleAPIResponse,
-  		  'token': token,
-  		  'request': {'function':   'setData',
-  					    'parameters': {'data': JSON.stringify(highlightToSend)}} 
-  		  });
+  	  'callback': googleAPIResponse,
+  	  'token': token,
+  	  'request': {'function': 'setData',
+  		      'parameters': JSON.stringify(jsonToSave)} 
+    });
   }
   
   var googleAPIResponse = function(response) {
-    document.getElementById("sending_gif").style.display = "none";
+    document.getElementById("sending_gif").style.visibility = "hidden";
     var info;
     if (response.response.result.status == 'ok') {
       info = "Data has been entered into <a href='" + response.response.result.doc + "' target='_blank'>your google sheet</a>."; 
@@ -162,7 +197,6 @@ function Popup() {
     };
     
     xhr.open('POST', options.url, true);
-    
     xhr.setRequestHeader('Authorization', 'Bearer ' + options.token);
     xhr.send(JSON.stringify(options.request));	
   	
@@ -197,8 +231,11 @@ function Popup() {
     signin_button = document.querySelector('#signin');
     signin_button.addEventListener('click', getAuthTokenInteractive);
     
-    xhr_button = document.querySelector('#getxhr');
-    xhr_button.addEventListener('click', sendDataToGoogleSheets.bind(xhr_button, true));
+    send_to_gs_button = document.querySelector('#getxhr');
+    send_to_gs_button.addEventListener('click', sendDataToGoogleSheets.bind(send_to_gs_button, true));
+
+    add_custom_search_term_button = document.querySelector('#add-new-search-term-button');
+    add_custom_search_term_button.addEventListener('click', addCustomSearchTerm.bind(add_custom_search_term_button, true));
     
     revoke_button = document.querySelector('#revoke');
     revoke_button.addEventListener('click', revokeToken);
@@ -223,9 +260,10 @@ function Popup() {
     return "no search term selected";
   }
 
-  var populateSearchTermOptions = function(langArray, selectedSearchTerm) {
+  this.populateSearchTermOptions = function(langArray, selectedSearchTerm) {
     var index=0;
     var selectElement = document.getElementById("search-term-select");
+    for (a in selectElement.options) { selectElement.options.remove(0); } 
     var opt = document.createElement("option");
     opt.value = "add-new";
     opt.innerHTML = "+ add custom";
@@ -252,11 +290,8 @@ function Popup() {
     } else {
       console.log(document.getElementById("search-term-select").value + "nope")
       document.getElementById("custom-search-term").classList.add("hidden"); 
-      document.getElementById("custom-search-term").classList.remove("visible"); 
-  
+      document.getElementById("custom-search-term").classList.remove("visible");
     }
-  
-  
   }
 
   this.useDataFromBackground = function(request) {
@@ -264,8 +299,9 @@ function Popup() {
       dataFromBackground = request.highlight;
       searchTermsFromBackground = request.search_terms;
       request.highlight ? highlight_data.innerHTML = request.highlight.highlight : null;
-      populateSearchTermOptions(searchTermsFromBackground, request.highlight.search_term);	
-      document.getElementById("loading_gif").style.display = "none";
+      this.populateSearchTermOptions(searchTermsFromBackground, request.highlight.search_term);	
+      document.getElementById("loading_gif").style.visibility = "hidden";
+      document.getElementById("loading_gif").style.opacity =  0;
     }
   } 
 }
@@ -282,11 +318,14 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-      if (request.status == "ok" && request.msg == "send_data") {
-	popup.useDataFromBackground(request);
-      } else {
-	console.log("there was issue getting info from background");
-      }
+  function(request, sender, sendResponse) {
+    if (request.status == "ok" && request.msg == "send_data") {
+      popup.useDataFromBackground(request);
+    } else if (request.status == "ok" && request.msg == "added_search_term") {
+      popup.populateSearchTermOptions(request.search_terms, request.new_search_term);	
+      document.getElementById("custom-text-input").value = "";
+    } else {
+      console.log("there was issue getting info from background");
     }
+  }
 )

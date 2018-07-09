@@ -3,6 +3,9 @@
    "description":"Keep track of your helpful google searches over history",
    "version":"0.1",
    "icons":{  
+	"16": "images/icon.png",
+        "32": "images/icon.png",
+        "48": "images/icon.png",
       "128":"images/icon.png"
    },
    "manifest_version":2,
@@ -23,7 +26,8 @@
 	  "<all_urls>",
       "declarativeContent",
       "identity",
-      "https://*.googleapis.com/*"
+      "https://*.googleapis.com/*",
+      "contextMenus"
    ],
    "oauth2":{  
       // client_id below is specifc to the application key. Follow the 
