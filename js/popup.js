@@ -73,12 +73,12 @@ function Popup() {
        
       //send this new searchterm to background script
       chrome.runtime.sendMessage({
-	msg: "send_new_search_term",
-	search_term: customSearchTerm,
-	tab_id: currentTabId,
-	tab_url: currentTabHref
+	      msg: "send_new_search_term",
+	      search_term: customSearchTerm,
+	      tab_id: currentTabId,
+	      tab_url: currentTabHref
       });
-      
+
       //update the user interface
       
       //erase the search term the user gave previously
@@ -96,7 +96,6 @@ function Popup() {
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
          currentTab = tabs[0];
          if (currentTab) { // Sanity check
-            console.log(currentTab.id);
             chrome.runtime.sendMessage({msg: "get_data", tab_id: currentTab.id, url: currentTab.url, highlighted_text: highlightedText});
 	  }
 	}
@@ -136,7 +135,7 @@ var sendDataToBackgroundForGoogleSheets = function () {
  
   var getAuthTokenCallback = function(token) {
     if (chrome.runtime.lastError) {
-      console.log('no token aqcuired');
+      console.log('no token acquired');
       //chrome.browserAction.setBadgeText({text: "no"});
       changeState(STATE_START);
     } else {
@@ -155,8 +154,6 @@ var sendDataToBackgroundForGoogleSheets = function () {
       document.getElementById("highlight_data").value
     );
     //TODO check that selected isn't + add custom
-    console.log("json to send is ");
-    console.log(highlightToSend);
     var jsonToSave = {msg: "new_highlight", data: highlightToSend};
     post({'url':	  'https://script.googleapis.com/v1/scripts/' + SCRIPT_ID +
     ':run',
@@ -178,7 +175,6 @@ var sendDataToBackgroundForGoogleSheets = function () {
       info = "Error..." + response.response.result.status;
       document.getElementById("show_result_error").innerHTML = info; 
     }	
-    console.log(info);
   }
   
   var updatePopup = function(info) {
@@ -223,7 +219,6 @@ var sendDataToBackgroundForGoogleSheets = function () {
 
 		// Update the user interface accordingly
 		changeState(STATE_START);
-		console.log("should have updated interface");
 	}
   }
 
@@ -254,8 +249,8 @@ var sendDataToBackgroundForGoogleSheets = function () {
     var list = document.getElementById("search-term-select");
     for (i = 0; i < list.length; i++) {
         if (list.options[i].selected) {
-	  return list.options[i].text;
-	};
+         	        return list.options[i].text;
+	      };
     }
     return "no search term selected";
   }
@@ -263,7 +258,9 @@ var sendDataToBackgroundForGoogleSheets = function () {
   this.populateSearchTermOptions = function(langArray, selectedSearchTerm) {
     var index=0;
     var selectElement = document.getElementById("search-term-select");
-    for (a in selectElement.options) { selectElement.options.remove(0); } 
+    for (a in selectElement.options) { 
+        selectElement.options.remove(0); 
+    } 
     var opt = document.createElement("option");
     opt.value = "add-new";
     opt.innerHTML = "+ add custom";
@@ -271,7 +268,7 @@ var sendDataToBackgroundForGoogleSheets = function () {
     for(index in langArray){
        opt = document.createElement("option");
        opt.value= index;
-       opt.innerHTML = langArray[index]; // whatever property it has
+       opt.innerHTML = langArray[index];
     
        // then append it to the select element
        selectElement.appendChild(opt);
@@ -284,11 +281,20 @@ var sendDataToBackgroundForGoogleSheets = function () {
 
   this.newSelectedSearchTerm = function() {
     if(document.getElementById("search-term-select").value == "add-new") {
-      console.log(document.getElementById("search-term-select").value + "yup")
       document.getElementById("custom-search-term").classList.add("visible"); 
       document.getElementById("custom-search-term").classList.remove("hidden"); 
     } else {
-      console.log(document.getElementById("search-term-select").value + "nope")
+      var currentSearchTerm;
+      var list = document.getElementById("search-term-select");
+      for (i = 0; i < list.length; i++) {
+        if (list.options[i].selected) {
+          currentSearchTerm = list.options[i].text;
+	      };
+      }
+      chrome.runtime.sendMessage({
+        msg: "send_new_search_term",
+        search_term: currentSearchTerm 
+      });
       document.getElementById("custom-search-term").classList.add("hidden"); 
       document.getElementById("custom-search-term").classList.remove("visible");
     }
@@ -318,6 +324,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 chrome.runtime.onMessage.addListener(
+//this.populateSearchTermOptions = function(langArray, selectedSearchTerm) 
   function(request, sender, sendResponse) {
     if (request.status == "ok" && request.msg == "send_data") {
       popup.useDataFromBackground(request);

@@ -224,7 +224,7 @@ function TabManager() {
 	          this.currentSearchTerm = getSearchTerm(this.currentUrl);
 	        }
         }
-        searchDict.addUrlToTab(this.currentSearchTerm, this.currentTabId, this.currentUrl.href);
+        searchDict.addUrlToTab(this.currentSearchTerm, this.currentTabId, this.currentUrl.href, this.previousTabId, this.previousUrl.href);
 	      console.log(searchDict);
       }
     }
@@ -269,34 +269,40 @@ chrome.runtime.onInstalled.addListener(function() {
 
   //add listener for when popup requests our collected info
   chrome.runtime.onMessage.addListener(
-        function(request, sender, sendResponse) {
-            if (request.msg === "get_data") {
-		//get info about how we got to this tab id
-		var currentSearchTerm = searchDict.getCurrentSearchTerm(request.tab_id, request.url);
+    function(request, sender, sendResponse) {
+      if (request.msg === "get_data") {
+		    //get info about how we got to this tab id
+		    var currentSearchTerm = searchDict.getCurrentSearchTerm(request.tab_id, request.url);
 
-		//make a new highlight object
-		var highlightObj = new Highlight(currentSearchTerm, request.url, request.highlighted_text);//currentSearchTerm, request.url, request.highlighted_text);
+		    //make a new highlight object
+		    var highlightObj = new Highlight(currentSearchTerm, request.url, request.highlighted_text);//currentSearchTerm, request.url, request.highlighted_text);
 	      var allSearchTerms = searchDict.getAllSearchTerms();
-		chrome.runtime.sendMessage({
-		  msg: "send_data",
-		  status: "ok",
-		  highlight: highlightObj,
-		  search_terms: allSearchTerms
-		});
-            } else if (request.msg == "get_search_terms") {
+		    chrome.runtime.sendMessage({
+		      msg: "send_data",
+		      status: "ok",
+		      highlight: highlightObj,
+		      search_terms: allSearchTerms
+		    });
+      } else if (request.msg == "get_search_terms") {
 	      var allSearchTerms = searchDict.getAllSearchTerms();
-	      chrome.runtime.sendMessage({ msg: "send_search_terms",
-		status: "ok",
-		content: allSearchTerms
+	      chrome.runtime.sendMessage({ 
+          msg: "send_search_terms",
+		      status: "ok",
+		      content: allSearchTerms
 	      });
 	    } else if (request.msg == "send_new_search_term") {
-	      searchDict.addUrlToTab(request.search_term, request.tab_id, lastOpenTabId, request.tab_url, tabManager.previousUrl.href);
+        console.log("got it");
+	      searchDict.updateSearchTerm(
+                tabManager.currentTabId,
+                tabManager.currentUrl.href,
+                request.search_term);
+        updateContextMenu(request.search_term);
 	      var updatedSearchTerms = searchDict.getAllSearchTerms();
 	      chrome.runtime.sendMessage({
-		msg: "added_search_term",
-		status: "ok",
-		search_terms: updatedSearchTerms,
-		new_search_term: request.search_term
+		      msg: "added_search_term",
+		      status: "ok",
+		      search_terms: updatedSearchTerms,
+		      new_search_term: request.search_term
 	      });
 	    } else if (request.mst = "send_highlight_to_google_sheet") {
 	      sendToGoogleSheets(newSearchTermData);
@@ -362,12 +368,16 @@ var Highlight = function(searchTerm, pageResult, highlight) {
 function SearchDict() {
   this.tab_ids = {};
   this.search_terms = [];
-  this.addUrlToTab = function (searchTerm, tabId, urlHref) {
+  this.addUrlToTab = function (searchTerm, tabId, urlHref, previousTabId, previousUrlHref) {
     if (!this.tab_ids[tabId]) {
       this.tab_ids[tabId] = {};
     }
     if (!this.tab_ids[tabId][urlHref]) {
       this.tab_ids[tabId][urlHref] = searchTerm;
+      
+    }
+    if (!searchTerm) {
+      this.tab_ids[tabId][urlHref] = this.tab_ids[previousTabId][previousUrlHref]; 
     }
     //if we don't already have search term recorded, record it now
     if (this.search_terms.indexOf(searchTerm) == -1 && searchTerm != PLACEHOLDER_SEARCH_TERM) {
@@ -384,10 +394,16 @@ function SearchDict() {
     console.log(tabId + " is tabId " + url + " is url" );
     if (this.tab_ids[tabId] != undefined) {
       if (this.tab_ids[tabId][url] != undefined) {
-	return this.tab_ids[tabId][url]; 
+	      return this.tab_ids[tabId][url]; 
       }
     }
     return PLACEHOLDER_SEARCH_TERM;
+  }
+  this.updateSearchTerm = function(tabId, urlHref, newSearchTerm) {
+    this.tab_ids[tabId][urlHref] = newSearchTerm; 
+    if (this.search_terms.indexOf(newSearchTerm) == -1 && newSearchTerm != PLACEHOLDER_SEARCH_TERM) {
+      this.search_terms.push(newSearchTerm);
+    }
   }
 }
 
