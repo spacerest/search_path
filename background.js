@@ -1,6 +1,17 @@
 var testText;
 var testToken;
 
+var createGoogleSheetFromTemplate = function() {
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "https://script.google.com/macros/s/AKfycbxhb0c5v9UaDXNjSWssFzgF6QPKdqQ-Oz-rmjni1-V2/exec?param=value",
+            false);
+    xhr.send();
+    var result = xhr.responseText;
+    console.log(result);
+}
+
+
 var updateContextMenu = function(searchTerm) {
   //update the rightclick option for someone to search here
   chrome.contextMenus.update("log-selection", {
@@ -61,7 +72,7 @@ function GoogleApiManager() {
   var removeAuthenticationNeeded = function () {
     chrome.browserAction.setBadgeText({text: ""});
   }
-  
+ ;; 
   var getAuthToken = function(options) {
     chrome.identity.getAuthToken(
       { 'interactive': options.interactive },
@@ -241,6 +252,9 @@ function TabManager() {
 
 /* main logic - start */
 chrome.runtime.onInstalled.addListener(function() { 
+  
+    
+  createGoogleSheetFromTemplate(); 
   //ask if we already have authentication. if we don't, ask for it 
   google.getAuthTokenSilent();
   
